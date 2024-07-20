@@ -39,28 +39,39 @@ def read_content(path: str):
 
             text.append(line)
 
-    return '\n'.join(text).strip('\n')
+    return remove_xml_tag('\n'.join(text).strip('\n'))
 
 
 def main():
     story_review_table = JsonData.get_json_data('story_review_table')
 
-    create = output_files('dist/game_stories')
+    create_main = output_files('dist/stories_main')
+    create_side = output_files('dist/stories_side')
 
     for item in story_review_table.values():
+        book_content = []
+        is_main = False
+
         if item['id'].startswith('main'):
             chapter = item['id'].split('_')[-1]
             book_name = f'主线第 {chapter} 章：' + item['name']
-            book_content = []
+            is_main = True
+        else:
+            if 'act' not in item['id']:
+                continue
+            book_name = item['name']
 
-            for sec in progress(sorted(item['infoUnlockDatas'], key=lambda n: n['storySort']), book_name):
-                file = gamedata + '/gamedata/story/{storyTxt}.txt'.format_map(sec)
-                section_name = '\n\n《{storyName} {avgTag}》'.format_map(sec)
+        for sec in progress(sorted(item['infoUnlockDatas'], key=lambda n: n['storySort']), book_name):
+            file = gamedata + '/story/{storyTxt}.txt'.format_map(sec)
+            section_name = '\n\n《{storyName} {avgTag}》'.format_map(sec)
 
-                book_content.append(section_name)
-                book_content.append(read_content(file))
+            book_content.append(section_name)
+            book_content.append(read_content(file))
 
-            create(book_name, book_content)
+        if is_main:
+            create_main(book_name, book_content)
+        else:
+            create_side(book_name, book_content)
 
 
 if __name__ == '__main__':
