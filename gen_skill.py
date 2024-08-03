@@ -7,7 +7,7 @@ def main():
     operator_list = JsonData.get_json_data('character_table')
     skill_data = JsonData.get_json_data('skill_table')
 
-    create = output_files('dist/operators_skills', separator='\n\n===分隔符===\n\n')
+    create = output_files('operators_skills', separator='\n\n===分隔符===\n\n')
 
     with open('prompts/skill.txt', mode='r', encoding='utf-8') as f:
         skill_prompts = f.read()

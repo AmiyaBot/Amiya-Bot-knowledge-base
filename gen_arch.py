@@ -22,7 +22,7 @@ def main():
 
         voice_map[char_id].append(item)
 
-    create = output_files('dist/operators_stories', separator='\n\n===分隔符===\n\n')
+    create = output_files('operators_stories', separator='\n\n===分隔符===\n\n')
 
     for char_id, char in progress(operator_list.items(), 'operators'):
         if char['profession'] in Game.token_classes:

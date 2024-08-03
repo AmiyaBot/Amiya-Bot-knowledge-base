@@ -45,8 +45,8 @@ def read_content(path: str):
 def main():
     story_review_table = JsonData.get_json_data('story_review_table')
 
-    create_main = output_files('dist/stories_main')
-    create_side = output_files('dist/stories_side')
+    create_main = output_files('stories_main')
+    create_side = output_files('stories_side')
 
     for item in story_review_table.values():
         book_content = []
