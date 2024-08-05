@@ -4,6 +4,9 @@ from src.output import output_files
 from src.utils import *
 
 
+operator_list = JsonData.get_json_data('character_table')
+
+
 def read_content(path: str):
     with open(path, mode='r', encoding='utf-8') as f:
         content = f.read()
@@ -32,6 +35,17 @@ def read_content(path: str):
 
                 text.append(r.group(1).replace('\\n', ''))
                 continue
+
+            r = re.search(r'^\[Dialog\(head="(\S+)",.*](.*)', line)
+            if r:
+                if paragraph != 3:
+                    text.append('')
+                    paragraph = 3
+
+                char = operator_list[r.group(1)] if r.group(1) in operator_list else None
+                text.append(f'{char["name"] if char else "（未知）"}：“{r.group(2).strip()}”')
+                continue
+
         else:
             if paragraph != 0:
                 text.append('')
@@ -40,6 +54,59 @@ def read_content(path: str):
             text.append(line)
 
     return remove_xml_tag('\n'.join(text).strip('\n'))
+
+
+def roguelike():
+    roguelike_topic_table = JsonData.get_json_data('roguelike_topic_table')
+    story_review_meta_table = JsonData.get_json_data('story_review_meta_table')
+
+    create_side = output_files('stories_roguelike')
+
+    for rid, detail in roguelike_topic_table['details'].items():
+
+        book_name = roguelike_topic_table['topics'][rid]['name']
+        book_content = [
+            f'《{book_name}》',
+            roguelike_topic_table['topics'][rid]['lineText'],
+        ]
+
+        if book_name == '傀影与猩红孤钻':
+            avgs = story_review_meta_table['actArchiveResData']['avgs']
+            indexes = [
+                (1, avgs['avg_rogue_1_2']),
+                (2, avgs['avg_rogue_1_3']),
+                (3, avgs['avg_rogue_1_4']),
+                (4, avgs['avg_rogue_1_5']),
+            ]
+
+            for idx, endbook in progress(indexes, book_name):
+                section_name = '《结局%d：%s》' % (idx, endbook['desc'])
+                content = (
+                    endbook['rawBrief']
+                    + '\n\n'
+                    + read_content(f'{gamedata}/story/%s.txt' % endbook['contentPath'].lower())
+                )
+                book_content.append(section_name)
+                book_content.append(content)
+        else:
+            for endbook in progress(detail['archiveComp']['endbook']['endbook'].values(), book_name):
+                ending = detail['endings'][endbook['endingId']]
+                section_name = '《结局%d：%s》' % (ending['priority'] + 1, ending['name'])
+                content = ending['desc'] + '\n\n' + read_content(f'{gamedata}/story/%s.txt' % endbook['avgId'].lower())
+
+                book_content.append(section_name)
+                book_content.append(content)
+
+        for month in detail['monthSquad'].values():
+            chat = detail['archiveComp']['chat']['chat'][month['chatId']]
+
+            book_content.append('《%s》' % month['teamName'])
+            book_content.append(month['teamDes'])
+
+            for item in chat['clientChatItemData']:
+                book_content.append(read_content(f'{gamedata}/story/%s.txt' % item['chatStoryId'].lower()))
+
+        create_side(book_name, book_content)
 
 
 def main():
@@ -75,4 +142,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    roguelike()

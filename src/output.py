@@ -18,7 +18,8 @@ def output_files(
     rec = 0
 
     if clear:
-        shutil.rmtree(f'{dist_folder}/{out_dir}')
+        if os.path.exists(f'{dist_folder}/{out_dir}'):
+            shutil.rmtree(f'{dist_folder}/{out_dir}')
 
     def create(name: str, contents: List[str]):
         nonlocal index, rec
