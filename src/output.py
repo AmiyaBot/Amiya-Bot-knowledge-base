@@ -12,9 +12,13 @@ def output_files(
     max_file_num: int = 100,
     separator: str = '\n\n',
     uploader: Optional[BosUploader] = None,
+    clear: bool = True,
 ):
     index = 1
     rec = 0
+
+    if clear:
+        shutil.rmtree(f'{dist_folder}/{out_dir}')
 
     def create(name: str, contents: List[str]):
         nonlocal index, rec
