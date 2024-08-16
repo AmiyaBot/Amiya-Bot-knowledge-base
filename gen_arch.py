@@ -1,6 +1,9 @@
-from src.jsonData import JsonData
-from src.output import output_files
+from src.output import OutputFiles
+from src.baidu.ab import AppBuilderKnowledgeBase
 from src.utils import *
+
+knowledge_base = AppBuilderKnowledgeBase('arch')
+book_store = OutputFiles('characters', single_file=argv('single_file', bool))
 
 
 def main():
@@ -22,8 +25,6 @@ def main():
 
         voice_map[char_id].append(item)
 
-    create = output_files('operators_stories', separator='\n\n===分隔符===\n\n')
-
     for char_id, char in progress(operator_list.items(), 'operators'):
         if char['profession'] in Game.token_classes:
             continue
@@ -33,45 +34,71 @@ def main():
             max_trait = char['trait']['candidates'][-1]
             trait = parse_template(max_trait['blackboard'], max_trait['overrideDescripton'] or trait)
 
-        operators_stories = [
-            '\n'.join(
-                [
-                    '【干员代号】' + char['name'],
-                    '【星级】' + char['rarity'].split('_')[-1],
-                    '【主职业】' + Game.classes[char['profession']],
-                    '【分支职业】' + sub_classes[char['subProfessionId']]['subProfessionName'],
-                    '【分支职业特性】' + trait,
-                    '【简介】' + (char['itemUsage'] or '无'),
-                    '【印象】' + (char['itemDesc'] or '无'),
-                ]
-            )
-        ]
+        char_name = char['name']
+
+        book_store.create(
+            char_name,
+            char_name,
+            [
+                '\n'.join(
+                    [
+                        '【干员代号】' + char_name,
+                        '【星级】' + char['rarity'].split('_')[-1],
+                        '【主职业】' + Game.classes[char['profession']],
+                        '【分支职业】' + sub_classes[char['subProfessionId']]['subProfessionName'],
+                        '【分支职业特性】' + trait,
+                        '【简介】' + (char['itemUsage'] or '无'),
+                        '【印象】' + (char['itemDesc'] or '无'),
+                    ]
+                )
+            ],
+        )
 
         if char_id in stories_data:
             for item in stories_data[char_id]['storyTextAudio']:
-                operators_stories.append(item['stories'][0]['storyText'])
+                book_store.create(
+                    char_name + '-' + item['storyTitle'],
+                    char_name,
+                    [item['stories'][0]['storyText']],
+                )
+
+            for item in stories_data[char_id]['handbookAvgList']:
+                name = char_name + '-' + item['storySetName']
+                book_content = []
+
+                for n in item['avgList']:
+                    book_content.append(n['storyIntro'])
+                    book_content.append(read_content(f'{gamedata}/story/[uc]' + n['storyInfo'] + '.txt'))
+                    book_content.append(read_content(f'{gamedata}/story/' + n['storyTxt'] + '.txt'))
+
+                book_store.create(name, char_name, book_content)
 
         if char_id in equips_rel:
             for m_id in equips_rel[char_id]:
                 module = modules_list[m_id]
-                operators_stories.append('《{uniEquipName}》\n{uniEquipDesc}'.format(**module))
+                book_store.create(
+                    char_name + '-' + module['uniEquipName'],
+                    char_name,
+                    [module['uniEquipDesc']],
+                )
 
         if char_id in voice_map:
-            operators_stories.append(
-                '《干员%s-语录》\n%s'
-                % (
-                    char['name'],
+            book_store.create(
+                char_name + '-语音记录',
+                char_name,
+                [
                     '\n'.join(
                         [
-                            '“%s”' % item['voiceText']
+                            char_name + '：“%s”' % item['voiceText']
                             for item in voice_map.get(char_id)
                             if '明日方舟' not in item['voiceText']
                         ]
-                    ),
-                )
+                    )
+                ],
             )
 
-        create(char['name'], operators_stories)
+    book_store.done()
+    knowledge_base.compare_files_and_update(book_store.result)
 
 
 if __name__ == '__main__':

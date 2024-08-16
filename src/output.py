@@ -1,61 +1,85 @@
-import json
-
-from typing import List, Optional
-from src.baidu import BosUploader
+from typing import List, Dict, Optional
+from src.baidu.bos import BosUploader
 from src.utils import *
 
-dist_folder = './dist'
 
+class OutputFiles:
+    def __init__(
+        self,
+        out_dir: str,
+        dist_folder: str = './dist',
+        separator: str = '\n\n',
+        uploader: Optional[BosUploader] = None,
+        single_file: bool = False,
+    ):
+        if single_file:
+            out_dir = f'{out_dir}-single'
 
-def output_files(
-    out_dir: str,
-    max_file_num: int = 100,
-    separator: str = '\n\n',
-    uploader: Optional[BosUploader] = None,
-    clear: bool = True,
-):
-    index = 1
-    rec = 0
-
-    if clear:
         if os.path.exists(f'{dist_folder}/{out_dir}'):
             shutil.rmtree(f'{dist_folder}/{out_dir}')
 
-    def create(name: str, contents: List[str]):
-        nonlocal index, rec
+        self.out_dir = out_dir
+        self.dist_folder = dist_folder
+        self.separator = separator
+        self.uploader = uploader
 
-        path = f'{out_dir}/{index}/{name}.txt'
-        content = separator.join(contents).strip('\n')
+        self.result = {}
+        self.words_count = 0
 
-        if uploader:
-            uploader.upload_string(f'/{path}', content)
+        self.single_file = single_file
+        self.single_file_contents: Dict[str, List[str]] = {}
+
+    def __gen_file(self, name: str, path: str, content: str):
+        count = len(content.replace('\n', '')) - 2
+
+        self.result[f'{name}.txt'] = {
+            'path': f'{self.dist_folder}/{path}',
+            'length': count,
+        }
+        self.words_count += count
+
+        if self.uploader:
+            self.uploader.upload_string(f'/{path}', content)
         else:
-            with create_file(f'{dist_folder}/{path}') as file:
+            with create_file(f'{self.dist_folder}/{path}') as file:
                 file.write(content)
 
-        rec += 1
-        if rec >= max_file_num:
-            rec = 0
-            index += 1
+    def create(self, name: str, group: str, contents: List[str]):
+        content = self.separator.join(contents).strip('\n')
 
-    return create
+        if self.single_file:
+            if group not in self.single_file_contents:
+                self.single_file_contents[group] = []
 
+            self.single_file_contents[group].append(f'《{name}》')
+            self.single_file_contents[group].append(content)
+            return
 
-def output_jsonl(data: list, filename: str, max_lines: int = 5000):
-    index = 0
-    line = 0
-    file = open(f'{filename}.jsonl', 'w', encoding='utf-8')
+        self.__gen_file(
+            name,
+            f'{self.out_dir}/%s{name}.txt' % (f'{group}/' if group else ''),
+            content,
+        )
 
-    while data:
-        item = data.pop(0)
-        json_str = json.dumps(item, ensure_ascii=False)
-        file.write(('\n' if line else '') + json_str)
-        line += 1
+    def done(self):
+        if self.single_file:
+            for filename, contents in self.single_file_contents.items():
+                content = self.separator.join(contents).strip('\n')
+                self.__gen_file(
+                    filename,
+                    f'{self.out_dir}/{filename}.txt',
+                    content,
+                )
 
-        if max_lines and line >= max_lines:
-            line = 0
-            index += 1
-            file.close()
-            file = open(f'{filename}_{index}.jsonl', 'w', encoding='utf-8')
+        print('文件数：', len(self.result.keys()))
+        print('总字数：', self.words_count)
 
-    file.close()
+        with create_file(f'{self.dist_folder}/{self.out_dir}.json') as file:
+            file.write(
+                json.dumps(
+                    self.result,
+                    ensure_ascii=False,
+                    indent=4,
+                    separators=(',', ': '),
+                )
+            )
