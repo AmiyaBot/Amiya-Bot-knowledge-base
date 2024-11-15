@@ -1,9 +1,14 @@
 from src.output import OutputFiles
-from src.baidu.ab import AppBuilderKnowledgeBase
+from src.baidu.appBuilder import AppBuilderKnowledgeBase
 from src.utils import *
 
 knowledge_base = AppBuilderKnowledgeBase('arch')
-book_store = OutputFiles('characters', single_file=argv('single_file', bool))
+book_store = OutputFiles(
+    'characters',
+    single_file=argv('single_file', bool),
+    separator='\n\n===separator===\n\n',
+    single_file_group=True,
+)
 
 
 def main():
@@ -98,7 +103,7 @@ def main():
             )
 
     book_store.done()
-    knowledge_base.compare_files_and_update(book_store.result)
+    knowledge_base.compare_files_and_update(book_store.result, separator=book_store.separator)
 
 
 if __name__ == '__main__':

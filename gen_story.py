@@ -1,9 +1,14 @@
 from src.output import OutputFiles
-from src.baidu.ab import AppBuilderKnowledgeBase
+from src.baidu.appBuilder import AppBuilderKnowledgeBase
 from src.utils import *
 
 knowledge_base = AppBuilderKnowledgeBase('story')
-book_store = OutputFiles('stories', single_file=argv('single_file', bool))
+book_store = OutputFiles(
+    'stories',
+    single_file=argv('single_file', bool),
+    separator='\n\n===separator===\n\n',
+    single_file_group=True,
+)
 
 
 def roguelike():
@@ -13,7 +18,16 @@ def roguelike():
     for rid, detail in roguelike_topic_table['details'].items():
 
         book_name = roguelike_topic_table['topics'][rid]['name']
-        book_store.create(book_name, book_name, [roguelike_topic_table['topics'][rid]['lineText']])
+        book_store.create(
+            book_name,
+            book_name,
+            [roguelike_topic_table['topics'][rid]['lineText']],
+            {
+                'title': book_name,
+                'section': '',
+                'part': '',
+            },
+        )
 
         if book_name == '傀影与猩红孤钻':
             avgs = story_review_meta_table['actArchiveResData']['avgs']
@@ -25,30 +39,59 @@ def roguelike():
             ]
 
             for idx, endbook in progress(indexes, book_name):
-                section_name = '%s-结局%d：%s' % (book_name, idx, endbook['desc'].strip())
+                section_name = '结局%d：%s' % (idx, endbook['desc'].strip())
                 content = (
                     endbook['rawBrief']
                     + '\n\n'
                     + read_content(f'{gamedata}/story/%s.txt' % endbook['contentPath'].lower())
                 )
-                book_store.create(section_name, book_name, [content])
+                book_store.create(
+                    f'{book_name}-{section_name}',
+                    book_name,
+                    [content],
+                    {
+                        'title': book_name,
+                        'section': section_name,
+                        'part': '',
+                    },
+                )
         else:
             for endbook in progress(detail['archiveComp']['endbook']['endbook'].values(), book_name):
                 ending = detail['endings'][endbook['endingId']]
-                section_name = '%s-结局%d：%s' % (book_name, ending['priority'] + 1, ending['name'].strip())
+                section_name = '结局%d：%s' % (ending['priority'] + 1, ending['name'].strip())
                 content = ending['desc'] + '\n\n' + read_content(f'{gamedata}/story/%s.txt' % endbook['avgId'].lower())
 
-                book_store.create(section_name, book_name, [content])
+                book_store.create(
+                    f'{book_name}-{section_name}',
+                    book_name,
+                    [content],
+                    {
+                        'title': book_name,
+                        'section': section_name,
+                        'part': '',
+                    },
+                )
 
         for month in detail['monthSquad'].values():
             chat = detail['archiveComp']['chat']['chat'][month['chatId']]
 
             book_content = [month['teamDes']]
+            section_name = month['teamName'].strip()
 
             for item in chat['clientChatItemData']:
                 book_content.append(read_content(f'{gamedata}/story/%s.txt' % item['chatStoryId'].lower()))
 
-            book_store.create('%s-%s' % (book_name, month['teamName'].strip()), book_name, book_content)
+            book_store.create(
+                f'{book_name}-{section_name}',
+                book_name,
+                book_content,
+                {
+                    'code': '',
+                    'title': book_name,
+                    'section': section_name,
+                    'part': '',
+                },
+            )
 
 
 def main():
@@ -68,11 +111,21 @@ def main():
             section_name = section_name.replace(':', '：')
             section_name = section_name.replace('?', '？')
 
-            book_store.create(section_name, book_name, [read_content(file)])
+            book_store.create(
+                section_name,
+                book_name,
+                [read_content(file)],
+                {
+                    'code': sec['storyCode'],
+                    'title': book_name,
+                    'section': sec['storyName'],
+                    'part': sec['avgTag'],
+                },
+            )
 
     roguelike()
     book_store.done()
-    knowledge_base.compare_files_and_update(book_store.result)
+    knowledge_base.compare_files_and_update(book_store.result, separator=book_store.separator)
 
 
 if __name__ == '__main__':

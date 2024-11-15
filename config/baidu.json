@@ -1,7 +1,16 @@
 {
     "appbuilder_token": "",
     "knowledge_bases": {
-        "arch": "966f80f7-4a14-41f4-b1ea-79df0d0b5131",
-        "story": "966f80f7-4a14-41f4-b1ea-79df0d0b5131"
-    }
+        "arch": {
+            "id": "",
+            "name": "明日方舟干员档案-Lite",
+            "desc": "《明日方舟》干员的基本信息、档案、故事、语录等数据"
+        },
+        "story": {
+            "id": "",
+            "name": "明日方舟游戏剧情-Lite",
+            "desc": "《明日方舟》游戏剧情"
+        }
+    },
+    "max_len": 6000
 }
