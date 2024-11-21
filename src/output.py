@@ -1,5 +1,4 @@
 from typing import List, Dict, Optional
-from src.baidu.bos import BosUploader
 from src.utils import *
 
 
@@ -9,7 +8,6 @@ class OutputFiles:
         out_dir: str,
         dist_folder: str = './dist',
         separator: str = '\n\n',
-        uploader: Optional[BosUploader] = None,
         single_file: bool = False,
         single_file_group: bool = False,
         single_file_group_max: int = 100,
@@ -23,7 +21,6 @@ class OutputFiles:
         self.out_dir = out_dir
         self.dist_folder = dist_folder
         self.separator = separator
-        self.uploader = uploader
 
         self.result = {}
         self.words_count = 0
@@ -44,11 +41,8 @@ class OutputFiles:
         }
         self.words_count += count
 
-        if self.uploader:
-            self.uploader.upload_string(f'/{path}', content)
-        else:
-            with create_file(f'{self.dist_folder}/{path}') as file:
-                file.write(content)
+        with create_file(f'{self.dist_folder}/{path}') as file:
+            file.write(content)
 
     def create(self, name: str, group: str, contents: List[str], extra: Optional[dict] = None):
         content = self.separator.join(contents).strip('\n')
