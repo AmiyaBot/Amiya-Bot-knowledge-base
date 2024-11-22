@@ -120,7 +120,7 @@ class AppBuilderKnowledgeBase:
                                 'regex': separator,
                                 'targetLength': max_len,
                                 'overlapRate': overlap_rate,
-                            }
+                            },
                         },
                     },
                 }
@@ -157,7 +157,9 @@ class AppBuilderKnowledgeBase:
 
         docs = self.get_all_documents()
 
-        for filename, item in progress(result.items(), 'updating knowledge_base'):
+        print(f'知识库文档数量：{len(docs)}')
+
+        for filename, item in progress(result.items(), f'更新知识库【{self.base_name}】'):
             if filename in docs:
                 doc = docs[filename]
                 if doc['wordCount'] == item['length']:

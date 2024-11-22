@@ -7,7 +7,6 @@ book_store = OutputFiles(
     'characters',
     single_file=argv('single_file', bool),
     separator='\n\n===separator===\n\n',
-    single_file_group=True,
 )
 
 
@@ -30,7 +29,7 @@ def main():
 
         voice_map[char_id].append(item)
 
-    for char_id, char in progress(operator_list.items(), 'operators'):
+    for char_id, char in progress(operator_list.items(), '干员资料'):
         if char['profession'] in Game.token_classes:
             continue
 

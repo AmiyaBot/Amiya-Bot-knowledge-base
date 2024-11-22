@@ -84,7 +84,7 @@ def progress(_list, name: str):
         block = int(p / 4)
         progress_line = '=' * block + ' ' * (25 - block)
 
-        msg = f'{name}...progress: [{progress_line}] ' f'{curr}/{count} {p}%'
+        msg = f'{name} [{progress_line}] ' f'{curr}/{count} {p}%'
 
         print('\r', end='')
         print(msg, end='')

@@ -7,7 +7,6 @@ book_store = OutputFiles(
     'stories',
     single_file=argv('single_file', bool),
     separator='\n\n===separator===\n\n',
-    single_file_group=True,
 )
 
 

@@ -9,8 +9,8 @@ class OutputFiles:
         dist_folder: str = './dist',
         separator: str = '\n\n',
         single_file: bool = False,
-        single_file_group: bool = False,
-        single_file_group_max: int = 100,
+        single_file_batch: bool = False,
+        single_file_batch_max: int = 100,
     ):
         if single_file:
             out_dir = f'{out_dir}-single'
@@ -26,12 +26,11 @@ class OutputFiles:
         self.words_count = 0
 
         self.single_file = single_file
-        self.single_file_group = single_file_group
-        self.single_file_group_max = single_file_group_max
+        self.single_file_batch = single_file_batch
+        self.single_file_batch_max = single_file_batch_max
         self.single_file_contents: Dict[str, List[str]] = {}
 
     def __gen_file(self, name: str, path: str, content: str, extra: Optional[dict] = None):
-        # count = len(content.replace('\n', '')) - 2
         count = len(content)
 
         self.result[f'{name}.txt'] = {
@@ -47,11 +46,13 @@ class OutputFiles:
     def create(self, name: str, group: str, contents: List[str], extra: Optional[dict] = None):
         content = self.separator.join(contents).strip('\n')
 
+        if not content:
+            return
+
         if self.single_file:
             if group not in self.single_file_contents:
                 self.single_file_contents[group] = []
 
-            # self.single_file_contents[group].append(f'《{name}》\n\n{content}')
             self.single_file_contents[group].append(content)
             return
 
@@ -63,7 +64,7 @@ class OutputFiles:
             index = 1
 
             for filename, contents in self.single_file_contents.items():
-                out_dir = f'{self.out_dir}/{index}' if self.single_file_group else self.out_dir
+                out_dir = f'{self.out_dir}/{index}' if self.single_file_batch else self.out_dir
                 content = self.separator.join(contents).strip('\n')
                 self.__gen_file(
                     filename,
@@ -71,9 +72,9 @@ class OutputFiles:
                     content,
                 )
 
-                if self.single_file_group:
+                if self.single_file_batch:
                     rec += 1
-                    if rec >= self.single_file_group_max:
+                    if rec >= self.single_file_batch_max:
                         index += 1
                         rec = 0
 
