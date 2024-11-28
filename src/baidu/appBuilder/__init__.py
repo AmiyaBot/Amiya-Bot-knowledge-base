@@ -19,7 +19,7 @@ class AppBuilderKnowledgeBase:
         self.base_name = self.base_info['name'] + (datetime.now().strftime('%Y%m%d') if new_base else '')
         self.knowledge_base_id = self.base_info['id']
 
-        if not self.knowledge_base_id:
+        if not self.knowledge_base_id and self.activated:
             self.create_base()
 
     @property
