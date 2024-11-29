@@ -21,20 +21,6 @@ def main():
         char_name = char['name']
         contents = []
 
-        if char['talents']:
-            for index, item in enumerate(char['talents']):
-                max_item = item['candidates'][-1]
-                if max_item['name']:
-                    contents.append(
-                        '%s第%d天赋：%s，效果为%s。'
-                        % (
-                            char_name,
-                            index + 1,
-                            max_item['name'],
-                            html_tag_format(max_item['description']),
-                        )
-                    )
-
         for index, item in enumerate(char['skills']):
             code = item['skillId']
 
@@ -52,26 +38,15 @@ def main():
                 Game.sp_type[detail['levels'][0]['spData']['spType']],
             )
 
-            # for lev, desc in enumerate(detail['levels']):
-            #     description = parse_template(desc['blackboard'], desc['description'])
-            #     skill_desc += '%s，初始SP：%d，SP消耗：%d，技能持续时间：%d秒，最大充能次数：%d，技能效果：%s；' % (
-            #         Game.skill_level[lev + 1],
-            #         desc['spData']['initSp'],
-            #         desc['spData']['spCost'],
-            #         integer(desc['duration']),
-            #         desc['spData']['maxChargeTime'],
-            #         description.replace('\\n', '\n').replace('\n', '。'),
-            #     )
-
-            desc = detail['levels'][-1]
-            description = parse_template(desc['blackboard'], desc['description'])
-            skill_desc += '初始SP：%d，SP消耗：%d，技能持续时间：%d秒，最大充能次数：%d，技能效果：%s；' % (
-                desc['spData']['initSp'],
-                desc['spData']['spCost'],
-                integer(desc['duration']),
-                desc['spData']['maxChargeTime'],
-                description.replace('\\n', '\n').replace('\n', '。'),
-            )
+            for desc in [detail['levels'][-1]]:
+                description = parse_template(desc['blackboard'], desc['description'])
+                skill_desc += '初始SP：%d，SP消耗：%d，技能持续时间：%d秒，最大充能次数：%d，技能效果：%s；' % (
+                    desc['spData']['initSp'],
+                    desc['spData']['spCost'],
+                    integer(desc['duration']),
+                    desc['spData']['maxChargeTime'],
+                    description.replace('\\n', '\n').replace('\n', '。'),
+                )
 
             contents.append(skill_desc)
 

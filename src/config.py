@@ -29,8 +29,8 @@ class Game:
         'RANGED': '远程位',
     }
     html_symbol = {
-        '<替身>': '&lt;替身&gt;',
-        '<支援装置>': '&lt;支援装置&gt;',
+        '<替身>': '替身',
+        '<支援装置>': '支援装置',
     }
     sp_type = {
         'INCREASE_WITH_TIME': '自动回复',
@@ -60,4 +60,19 @@ class Game:
         8: '等级8（专精1）',
         9: '等级9（专精2）',
         10: '等级10（专精3）',
+    }
+    attrs = {
+        'maxHp': '最大生命值',
+        'atk': '攻击力',
+        'def': '防御力',
+        'magicResistance': '魔法抗性',
+        'attackSpeed': '攻击速度',
+        'baseAttackTime': '攻击间隔',
+        'blockCnt': '阻挡数',
+        'cost': '部署费用',
+        'respawnTime': '再部署时间',
+    }
+    attrs_unit = {
+        'baseAttackTime': '秒',
+        'respawnTime': '秒',
     }

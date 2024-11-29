@@ -109,7 +109,7 @@ def html_tag_format(text: str):
     for o, f in Game.html_symbol.items():
         text = text.replace(o, f)
 
-    return remove_xml_tag(text)
+    return remove_xml_tag(text).replace('\n', '。').replace('\\n', '。')
 
 
 def pascal_case_to_snake_case(camel_case: str):

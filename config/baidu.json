@@ -1,20 +1,29 @@
 {
     "appbuilder_token": "",
     "knowledge_bases": {
-        "arch": {
+        "attr": {
             "id": "",
-            "name": "明日方舟干员档案-Lite",
-            "desc": "《明日方舟》干员的基本信息、档案、故事、语录等数据"
+            "name": "明日方舟干员属性",
+            "desc": "《明日方舟》干员的基础属性数值",
+            "length_ver": false
         },
         "skill": {
             "id": "",
-            "name": "明日方舟干员技能-Lite",
-            "desc": "《明日方舟》干员的技能"
+            "name": "明日方舟干员技能",
+            "desc": "《明日方舟》干员的技能",
+            "length_ver": false
+        },
+        "character": {
+            "id": "",
+            "name": "明日方舟干员档案",
+            "desc": "《明日方舟》干员的基本信息、档案、故事、语录等数据",
+            "length_ver": true
         },
         "story": {
             "id": "",
-            "name": "明日方舟游戏剧情-Lite",
-            "desc": "《明日方舟》游戏剧情"
+            "name": "明日方舟游戏剧情",
+            "desc": "《明日方舟》游戏剧情",
+            "length_ver": true
         }
     },
     "max_len": 6000

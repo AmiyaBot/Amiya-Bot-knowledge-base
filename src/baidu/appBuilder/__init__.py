@@ -13,10 +13,12 @@ class AppBuilderKnowledgeBase:
         with open('config/baidu.json', mode='r', encoding='utf-8') as f:
             config = json.load(f)
 
+        self.config = config
+        self.new_base = new_base
+
         self.token = config['appbuilder_token']
         self.max_len = config['max_len']
         self.base_info = config['knowledge_bases'][base_type]
-        self.base_name = self.base_info['name'] + (datetime.now().strftime('%Y%m%d') if new_base else '')
         self.knowledge_base_id = self.base_info['id']
 
         if not self.knowledge_base_id and self.activated:
@@ -25,6 +27,18 @@ class AppBuilderKnowledgeBase:
     @property
     def activated(self):
         return bool(self.token)
+
+    @property
+    def base_name(self):
+        return '-'.join(
+            n
+            for n in [
+                self.base_info['name'],
+                str(self.config['max_len']) if self.base_info['length_ver'] else '',
+                datetime.now().strftime('%Y%m%d') if self.new_base else '',
+            ]
+            if n
+        )
 
     @property
     def headers(self):

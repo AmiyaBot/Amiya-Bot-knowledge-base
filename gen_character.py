@@ -2,7 +2,7 @@ from src.output import OutputFiles
 from src.baidu.appBuilder import AppBuilderKnowledgeBase
 from src.utils import *
 
-knowledge_base = AppBuilderKnowledgeBase('arch')
+knowledge_base = AppBuilderKnowledgeBase('character')
 book_store = OutputFiles(
     'characters',
     single_file=argv('single_file', bool),
