@@ -22,9 +22,9 @@ jobs:
       - name: Get latest commit SHA from external repo
         id: get_latest
         run: |
-          # SHA=$(git ls-remote https://github.com/Kengxxiao/ArknightsGameData.git refs/heads/master | awk '{print $1}')
+          SHA=$(git ls-remote https://github.com/Kengxxiao/ArknightsGameData.git refs/heads/master | awk '{print $1}')
           # 测试用代码，从我的repo检测更改
-          SHA=$(git ls-remote https://github.com/hsyhhssyy/RebaseTest.git refs/heads/master | awk '{print $1}')
+          # SHA=$(git ls-remote https://github.com/hsyhhssyy/RebaseTest.git refs/heads/master | awk '{print $1}')
           echo "Latest SHA: $SHA"
           echo "sha=$SHA" >> $GITHUB_OUTPUT
         shell: bash
