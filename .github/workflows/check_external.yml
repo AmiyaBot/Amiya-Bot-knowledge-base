@@ -2,8 +2,8 @@ name: 检查K佬的仓库
 
 on:
   schedule:
-    - cron: '*/5 * * * *' # 每5分钟触发一次, 测试用频率
-    # - cron: '0 8 * * *' # UTC时间每天08:00，即北京时间16:00 
+    # - cron: '*/5 * * * *' # 每5分钟触发一次, 测试用频率
+    - cron: '0 8 * * *' # UTC时间每天08:00，即北京时间16:00 
   workflow_dispatch: # 允许手动触发此 Workflow
 
 jobs:
