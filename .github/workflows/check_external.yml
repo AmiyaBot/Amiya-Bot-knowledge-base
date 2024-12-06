@@ -47,6 +47,7 @@ jobs:
             echo "shas_different=true" >> $GITHUB_ENV
           else
             echo "shas_different=false" >> $GITHUB_ENV
+          fi
         shell: bash
 
       - name: Trigger Another Workflow if SHAs are different
