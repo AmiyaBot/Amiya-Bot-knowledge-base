@@ -34,11 +34,14 @@ jobs:
       run: |
         pip install -r requirements.txt
 
-    - name: Run Python scripts
-      run: |
-        python gen_attr.py --single_file
-                
     - name: Clone ArknightsGameData repository
       run: |
         git clone https://github.com/Kengxxiao/ArknightsGameData ./gamedata_rep
 
+    - name: Run Python scripts
+      run: |
+        python gen_attr.py --single_file
+        python gen_skill.py --single_file
+        python gen_character.py --single_file
+        python gen_story.py --single_file
+                
