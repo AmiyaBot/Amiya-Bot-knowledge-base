@@ -6,6 +6,7 @@ on:
       - master
     paths-ignore:
       - '.github/workflows/**'  # 忽略 .github/workflows 目录下的所有更改
+      - 'kengxxiao_last_commit.txt'  # 忽略 kengxxiao_last_commit.txt
   workflow_call: # 允许其他workflow触发这个workflow
   workflow_dispatch: # 允许手动触发这个workflow
 
