@@ -1,0 +1,62 @@
+name: 检查K佬的仓库
+
+on:
+  schedule:
+    - cron: '0 8 * * *' # UTC时间每天08:00，即北京时间16:00
+  workflow_dispatch: # 允许手动触发此 Workflow
+
+jobs:
+  check-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 步骤1：检出当前仓库代码
+      - name: Checkout current repository
+        uses: actions/checkout@v3
+
+      # 步骤2：获取外部仓库的最新提交 SHA
+      - name: Get latest commit SHA from external repo
+        id: get_latest
+        run: |
+          SHA=$(git ls-remote https://github.com/Kengxxiao/ArknightsGameData.git refs/heads/master | awk '{print $1}')
+          echo "sha=$SHA" >> $GITHUB_OUTPUT
+        shell: bash
+
+      # 步骤3：读取记录的 SHA
+      - name: Read last commit SHA
+        id: read_last
+        run: |
+          if [ -f .github/workflows/kengxxiao_last_commit.txt ]; then
+            LAST_SHA=$(cat .github/workflows/kengxxiao_last_commit.txt)
+          else
+            LAST_SHA=""
+          fi
+          echo "last_sha=$LAST_SHA" >> $GITHUB_ENV
+        shell: bash
+
+      # 步骤4：比较最新 SHA 和记录的 SHA
+      - name: Compare SHAs
+        id: compare
+        run: |
+          if [ "${{ steps.get_latest.outputs.sha }}" != "$last_sha" ]; then
+            echo "shas_different=true" >> $GITHUB_ENV
+          else
+            echo "shas_different=false" >> $GITHUB_ENV
+        shell: bash
+
+      # 步骤5：触发另一个可重用的 Workflow
+      - name: Trigger Another Workflow if SHAs are different
+        if: env.shas_different == 'true'
+        uses: ./.github/workflows/auto.yml
+
+      # 步骤6：如果 SHA 不同，则更新 last_commit.txt 文件
+      - name: Update last_commit.txt with new SHA
+        if: env.shas_different == 'true'
+        run: |
+          echo "${{ steps.get_latest.outputs.sha }}" > .github/workflows/kengxxiao_last_commit.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/kengxxiao_last_commit.txt
+          git commit -m "Update kengxxiao_last_commit.txt with new SHA: ${{ steps.get_latest.outputs.sha }}"
+          git push
+        shell: bash
