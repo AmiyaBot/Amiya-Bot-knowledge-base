@@ -25,11 +25,21 @@ jobs:
     - name: Generate baidu.json from Action Secrets
       run: |
         echo "{\"BAIDU_JSON\": \"${{ secrets.BAIDU_JSON }}\"}" > ./config/baidu.json
-
+        
+    - name: Output JSON files content (for testing)
+      run: |
+        echo "Contents of gamedata.json:"
+        cat ./config/gamedata.json
+        echo "Contents of baidu.json:"
+        cat ./config/baidu.json
+        
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
 
-    - name: Run the batch file
+    - name: Run Python scripts
       run: |
-        ./run.bat
+        python gen_attr.py --single_file
+        python gen_skill.py --single_file
+        python gen_character.py --single_file
+        python gen_story.py --single_file
