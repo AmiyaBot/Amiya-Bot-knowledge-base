@@ -1,0 +1,52 @@
+name: 同步知识库到百度
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '.github/workflows/**'  # 忽略 .github/workflows 目录下的所有更改
+      - 'kengxxiao_last_commit.txt'  # 忽略 kengxxiao_last_commit.txt
+  workflow_call: # 允许其他workflow触发这个workflow
+  workflow_dispatch: # 允许手动触发这个workflow
+
+jobs:
+  setup_and_run:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v3
+
+    - name: Generate gamedata.json
+      run: |
+        GAMEDATA_ABS_PATH=$(realpath ./gamedata_rep)/zh_CN/gamedata
+        sed -i "s|\[GameDataPath\]|${GAMEDATA_ABS_PATH}|g" ./config/gamedata.json
+    
+    - name: Replace [BaiduToken] with secret BAIDU_TOKEN
+      run: |
+        sed -i 's|\[BaiduToken\]|${{ secrets.BAIDU_TOKEN }}|g' ./config/baidu.json
+      env:
+        BAIDU_TOKEN: ${{ secrets.BAIDU_TOKEN }}
+          
+    - name: Output JSON files content (for testing)
+      run: |
+        echo "Contents of gamedata.json:"
+        cat ./config/gamedata.json
+        echo "Contents of baidu.json:"
+        cat ./config/baidu.json
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Clone ArknightsGameData repository
+      run: |
+        git clone https://github.com/Kengxxiao/ArknightsGameData ./gamedata_rep
+
+    - name: Run Python scripts
+      run: |
+        python gen_attr.py --single_file
+        python gen_skill.py --single_file
+        python gen_character.py --single_file
+        python gen_story.py --single_file
+                
