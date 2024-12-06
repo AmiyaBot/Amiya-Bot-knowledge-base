@@ -7,6 +7,7 @@ on:
     paths-ignore:
       - '.github/workflows/kengxxiao_last_commit.txt'  # 忽略 last_commit.txt 的更改
   workflow_call: # 允许其他workflow触发这个workflow
+  workflow_dispatch: # 允许手动触发这个workflow
 
 jobs:
   setup_and_run:
