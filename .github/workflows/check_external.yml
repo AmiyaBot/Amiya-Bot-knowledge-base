@@ -2,7 +2,8 @@ name: 检查K佬的仓库
 
 on:
   schedule:
-    - cron: '0 8 * * *' # UTC时间每天08:00，即北京时间16:00
+    - cron: '*/5 * * * *' # 每5分钟触发一次, 测试用频率
+    # - cron: '0 8 * * *' # UTC时间每天08:00，即北京时间16:00 
   workflow_dispatch: # 允许手动触发此 Workflow
 
 jobs:
@@ -19,7 +20,9 @@ jobs:
       - name: Get latest commit SHA from external repo
         id: get_latest
         run: |
-          SHA=$(git ls-remote https://github.com/Kengxxiao/ArknightsGameData.git refs/heads/master | awk '{print $1}')
+          # SHA=$(git ls-remote https://github.com/Kengxxiao/ArknightsGameData.git refs/heads/master | awk '{print $1}')
+          # 测试用代码，从我的repo检测更改
+          SHA=$(git ls-remote https://github.com/hsyhhssyy/RebaseTest.git refs/heads/master | awk '{print $1}')
           echo "Latest SHA: $SHA"
           echo "sha=$SHA" >> $GITHUB_OUTPUT
         shell: bash
