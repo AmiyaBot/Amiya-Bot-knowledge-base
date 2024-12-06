@@ -5,12 +5,8 @@ on:
     branches:
       - master
     paths-ignore:
-      - '.github/workflows/kengxxiao_last_commit.txt'  # 忽略 last_commit.txt 的更改
+      - '.github/workflows/**'  # 忽略 .github/workflows 目录下的所有更改
   workflow_call: # 允许其他workflow触发这个workflow
-    inputs:
-      useless_input:
-        type: string
-        required: false
   workflow_dispatch: # 允许手动触发这个workflow
 
 jobs:
