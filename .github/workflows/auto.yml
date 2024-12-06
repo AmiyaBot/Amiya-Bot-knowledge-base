@@ -28,11 +28,6 @@ jobs:
         cat ./config/gamedata.json
         echo "Contents of baidu.json:"
         cat ./config/baidu.json
-        
-    - name: Clone ArknightsGameData repository
-      run: |
-        git clone https://github.com/Kengxxiao/ArknightsGameData ./gamedata_rep
-
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
@@ -40,3 +35,8 @@ jobs:
     - name: Run Python scripts
       run: |
         python gen_attr.py --single_file
+                
+    - name: Clone ArknightsGameData repository
+      run: |
+        git clone https://github.com/Kengxxiao/ArknightsGameData ./gamedata_rep
+
