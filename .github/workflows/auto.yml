@@ -1,4 +1,4 @@
-name: Setup and Run Process
+name: 同步知识库到百度
 
 on:
   push:
@@ -6,6 +6,7 @@ on:
       - master
     paths-ignore:
       - '.github/workflows/kengxxiao_last_commit.txt'  # 忽略 last_commit.txt 的更改
+  workflow_call: # 允许其他workflow触发这个workflow
 
 jobs:
   setup_and_run:
