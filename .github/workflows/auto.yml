@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths-ignore:
-      - '.github/workflows/Kengxxiao_last_commit.txt'  # 忽略 last_commit.txt 的更改
+      - '.github/workflows/kengxxiao_last_commit.txt'  # 忽略 last_commit.txt 的更改
 
 jobs:
   setup_and_run:
