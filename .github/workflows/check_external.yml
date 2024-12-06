@@ -32,8 +32,8 @@ jobs:
       - name: Read last commit SHA
         id: read_last
         run: |
-          if [ -f .github/workflows/kengxxiao_last_commit.txt ]; then
-            LAST_SHA=$(cat .github/workflows/kengxxiao_last_commit.txt)
+          if [ -f kengxxiao_last_commit.txt ]; then
+            LAST_SHA=$(cat kengxxiao_last_commit.txt)
             echo "Last recorded SHA: $LAST_SHA"
           else
             LAST_SHA=""
@@ -55,10 +55,10 @@ jobs:
       - name: Update last_commit.txt with new SHA
         if: env.shas_different == 'true'
         run: |
-          echo "${{ steps.get_latest.outputs.sha }}" > .github/workflows/kengxxiao_last_commit.txt
+          echo "${{ steps.get_latest.outputs.sha }}" > kengxxiao_last_commit.txt
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .github/workflows/kengxxiao_last_commit.txt
+          git add kengxxiao_last_commit.txt
           git commit -m "Update kengxxiao_last_commit.txt with new SHA: ${{ steps.get_latest.outputs.sha }}"
           git push
         shell: bash
