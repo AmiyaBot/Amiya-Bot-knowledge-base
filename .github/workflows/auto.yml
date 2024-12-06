@@ -20,7 +20,7 @@ jobs:
     
     - name: Replace [BaiduToken] with secret BAIDU_TOKEN
       run: |
-        sed -i 's/\[BaiduToken\]/${{ secrets.BAIDU_TOKEN }}/g' ./config/baidu.json
+        sed -i 's|\[BaiduToken\]|${{ secrets.BAIDU_TOKEN }}|g' ./config/baidu.json
       env:
         BAIDU_TOKEN: ${{ secrets.BAIDU_TOKEN }}
           
