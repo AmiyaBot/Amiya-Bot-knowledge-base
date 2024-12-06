@@ -165,19 +165,33 @@ class AppBuilderKnowledgeBase:
         self,
         result: dict,
         separator: str = '\n\n',
+        delete_not_exist: bool = True,
     ):
         if not self.activated:
             return
 
         docs = self.get_all_documents()
 
-        print(f'知识库文档数量：{len(docs)}')
+        add = []
+        delete = []
 
-        for filename, item in progress(result.items(), f'更新知识库【{self.base_name}】'):
+        if delete_not_exist:
+            for filename, doc in docs.items():
+                if filename not in result:
+                    delete.append(doc)
+
+        for filename, item in result.items():
             if filename in docs:
                 doc = docs[filename]
                 if doc['wordCount'] == item['length']:
                     continue
+                delete.append(doc)
+            add.append(item)
+
+        if delete:
+            for doc in progress(delete, f'删除知识库差异文件【{self.base_name}】'):
                 self.delete_document(doc['id'])
 
-            self.add_document(item['path'], separator=separator, max_len=self.max_len)
+        if add:
+            for item in progress(add, f'更新知识库文件【{self.base_name}】'):
+                self.add_document(item['path'], separator=separator, max_len=self.max_len)

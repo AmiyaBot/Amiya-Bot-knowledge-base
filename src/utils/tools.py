@@ -79,7 +79,7 @@ def create_file(path):
 def progress(_list, name: str):
     count = len(_list)
 
-    def print_bar(n=None):
+    def print_bar():
         p = int(curr / count * 100)
         block = int(p / 4)
         progress_line = '=' * block + ' ' * (25 - block)
@@ -97,7 +97,7 @@ def progress(_list, name: str):
     for item in _list:
         yield item
         curr += 1
-        print_bar(item)
+        print_bar()
 
     print()
 
