@@ -16,11 +16,11 @@ jobs:
     - name: Generate gamedata.json
       run: |
         GAMEDATA_ABS_PATH=$(realpath ./gamedata_rep)
-        echo "{\"gamedata\": \"${GAMEDATA_ABS_PATH}/zh_CN/gamedata\"}" > ./config/gamedata.json
+        printf "{\"gamedata\": \"%s/zh_CN/gamedata\"}" "${GAMEDATA_ABS_PATH}" > ./config/gamedata.json
 
     - name: Generate baidu.json from Action Secrets
       run: |
-        echo "${{ secrets.BAIDU_JSON }}" > ./config/baidu.json
+        printf "%s" "${{ secrets.BAIDU_JSON }}" > ./config/baidu.json
         
     - name: Output JSON files content (for testing)
       run: |
