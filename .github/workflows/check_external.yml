@@ -9,6 +9,8 @@ on:
 jobs:
   check-commit:
     runs-on: ubuntu-latest
+    outputs:
+      shas_different: ${{ env.shas_different }}
 
     steps:
       # 步骤1：检出当前仓库代码
@@ -50,10 +52,6 @@ jobs:
           fi
         shell: bash
 
-      - name: Trigger Another Workflow if SHAs are different
-        if: env.shas_different == 'true'
-        uses: ./.github/workflows/auto.yml
-
       - name: Update last_commit.txt with new SHA
         if: env.shas_different == 'true'
         run: |
@@ -64,3 +62,8 @@ jobs:
           git commit -m "Update kengxxiao_last_commit.txt with new SHA: ${{ steps.get_latest.outputs.sha }}"
           git push
         shell: bash
+
+  trigger-workflow:
+    needs: check-commit
+    if: needs.check-commit.outputs.shas_different == 'true'
+    uses: ./.github/workflows/auto.yml
