@@ -1,0 +1,69 @@
+name: 检查K佬的仓库
+
+on:
+  schedule:
+    # - cron: '*/5 * * * *' # 每5分钟触发一次, 测试用频率
+    - cron: '0 8 * * *' # UTC时间每天08:00，即北京时间16:00 
+  workflow_dispatch: # 允许手动触发此 Workflow
+
+jobs:
+  check-commit:
+    runs-on: ubuntu-latest
+    outputs:
+      shas_different: ${{ env.shas_different }}
+
+    steps:
+      # 步骤1：检出当前仓库代码
+      - name: Checkout current repository
+        uses: actions/checkout@v3
+        with:
+            persist-credentials: true
+
+      - name: Get latest commit SHA from external repo
+        id: get_latest
+        run: |
+          SHA=$(git ls-remote https://github.com/Kengxxiao/ArknightsGameData.git refs/heads/master | awk '{print $1}')
+          # 测试用代码，从我的repo检测更改
+          # SHA=$(git ls-remote https://github.com/hsyhhssyy/RebaseTest.git refs/heads/master | awk '{print $1}')
+          echo "Latest SHA: $SHA"
+          echo "sha=$SHA" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Read last commit SHA
+        id: read_last
+        run: |
+          if [ -f kengxxiao_last_commit.txt ]; then
+            LAST_SHA=$(cat kengxxiao_last_commit.txt)
+            echo "Last recorded SHA: $LAST_SHA"
+          else
+            LAST_SHA=""
+            echo "No last recorded SHA found."
+          fi
+          echo "last_sha=$LAST_SHA" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Compare SHAs
+        id: compare
+        run: |
+          if [ "${{ steps.get_latest.outputs.sha }}" != "${{ env.last_sha }}" ]; then
+            echo "shas_different=true" >> $GITHUB_ENV
+          else
+            echo "shas_different=false" >> $GITHUB_ENV
+          fi
+        shell: bash
+
+      - name: Update last_commit.txt with new SHA
+        if: env.shas_different == 'true'
+        run: |
+          echo "${{ steps.get_latest.outputs.sha }}" > kengxxiao_last_commit.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add kengxxiao_last_commit.txt
+          git commit -m "Update kengxxiao_last_commit.txt with new SHA: ${{ steps.get_latest.outputs.sha }}"
+          git push
+        shell: bash
+
+  trigger-workflow:
+    needs: check-commit
+    if: needs.check-commit.outputs.shas_different == 'true'
+    uses: ./.github/workflows/auto.yml
