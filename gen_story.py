@@ -77,7 +77,7 @@ def roguelike():
             book_content = [month['teamDes']]
             section_name = month['teamName'].strip()
 
-            for item in chat['clientChatItemData']:
+            for item in chat['chatItemList']:
                 book_content.append(read_content(f'{gamedata}/story/%s.txt' % item['chatStoryId'].lower()))
 
             book_store.create(
